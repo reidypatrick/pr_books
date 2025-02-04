@@ -10,7 +10,11 @@ ui <- fluidPage(
              h3("Novels"),
              fluidRow(
                column(4, 
-                      img(src = "https://via.placeholder.com/150", alt = "Book Cover"),
+                      img(
+                        src = "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1483232988i/33652490.jpg",
+                        alt = "Book Cover",
+                        height = "200px",
+                        width = "auto"),
                       h4("Dummy Novel 1"),
                       p("Author: John Doe"),
                       p("Year of Publication: 2020"),
