@@ -1,4 +1,6 @@
 library(epubr)
+library(tidyverse)
+library(rvest)
 
 source("R/functions/source_functions.R")
 source_functions()
