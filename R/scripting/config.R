@@ -11,4 +11,4 @@ options(log_verbose = TRUE)
 options(r_functions_path = "R/functions")
 
 # Set Global Variables ---------------------------------------------------------
-goodreads_file_path <- "data/input/goodreads_library_export.csv"
+goodreads_file_path <- "data/input/goodreads_data.csv"
