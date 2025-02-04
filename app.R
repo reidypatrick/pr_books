@@ -3,7 +3,7 @@ library(shinyWidgets)
 source("R/scripting/config.R")
 
 # Load Goodreads data
-goodreads_data <- get_goodreads_data()[1:4, ]
+goodreads_data <- get_goodreads_data()
 
 # Custom CSS
 custom_css <- "
@@ -77,7 +77,7 @@ server <- function(input, output, session) {
             div(
               class = "book-cover",
               img(
-                src = tryCatch(get_goodreads_cover(goodreads_data$`Book Id`[i]), error = function(e) ""),
+                src = goodreads_data$Cover_URL[i],
                 alt = "Book Cover",
                 height = "200px",
                 width = "auto"
@@ -90,8 +90,8 @@ server <- function(input, output, session) {
               class = "book-details",
               h4(class = "book-title", goodreads_data$Title[i]),
               p(class = "book-author", paste("Author:", goodreads_data$Author[i])),
-              p(class = "book-year", paste("Year of Publication:", goodreads_data$`Original Publication Year`[i])),
-              p(paste("Total Pages:", goodreads_data$`Number of Pages`[i])),
+              p(class = "book-year", paste("Year of Publication:", goodreads_data$Original.Publication.Year[i])),
+              p(paste("Total Pages:", goodreads_data$Number.of.Pages[i])),
               numericInput(
                 inputId = paste0("current_page_", i),
                 label = "Current Page:",
@@ -117,7 +117,7 @@ server <- function(input, output, session) {
     lapply(seq_len(nrow(goodreads_data)), function(i) {
       output[[paste0("reading_progress_", i)]] <- renderUI({
         # Get total pages from the dataset
-        total_pages <- goodreads_data$`Number of Pages`[i]
+        total_pages <- goodreads_data$Number.of.Pages[i]
 
         # Get current page input, defaulting to 0 if empty or invalid
         current_page <- tryCatch(
