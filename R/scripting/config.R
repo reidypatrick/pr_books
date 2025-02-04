@@ -1,3 +1,5 @@
+library(epubr)
+
 source("R/functions/source_functions.R")
 source_functions()
 
