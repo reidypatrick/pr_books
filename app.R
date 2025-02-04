@@ -3,7 +3,7 @@ library(shinyWidgets)
 source("R/scripting/config.R")
 
 # Load Goodreads data
-goodreads_data <- get_goodreads_data()[1:4,]
+goodreads_data <- get_goodreads_data()[1:4, ]
 
 # Custom CSS
 custom_css <- "
@@ -62,13 +62,12 @@ ui <- fluidPage(
 
 # Server
 server <- function(input, output, session) {
-  
   # Dynamically generate UI for novels
   output$novels_ui <- renderUI({
     if (nrow(goodreads_data) == 0) {
       return(p("No books found."))
     }
-    
+
     rows_list <- lapply(seq_len(nrow(goodreads_data)), function(i) {
       div(
         class = "book-container",
@@ -109,35 +108,38 @@ server <- function(input, output, session) {
         )
       )
     })
-    
+
     do.call(tagList, rows_list)
   })
-  
+
   # Dynamically generate progress bars for each book
   observe({
     lapply(seq_len(nrow(goodreads_data)), function(i) {
       output[[paste0("reading_progress_", i)]] <- renderUI({
         # Get total pages from the dataset
         total_pages <- goodreads_data$`Number of Pages`[i]
-        
+
         # Get current page input, defaulting to 0 if empty or invalid
-        current_page <- tryCatch({
-          as.numeric(input[[paste0("current_page_", i)]])
-        }, error = function(e) {
-          0
-        })
-        
+        current_page <- tryCatch(
+          {
+            as.numeric(input[[paste0("current_page_", i)]])
+          },
+          error = function(e) {
+            0
+          }
+        )
+
         # Ensure current_page is valid
         if (is.na(current_page) || current_page < 0) {
           current_page <- 0
         }
-        
+
         # Calculate progress
         progress_value <- round((current_page / total_pages) * 100)
-        
+
         # Ensure progress_value is within 0-100
         progress_value <- max(0, min(100, progress_value))
-        
+
         # Render progress bar
         progressBar(
           id = paste0("progress_", i),
