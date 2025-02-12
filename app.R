@@ -84,83 +84,10 @@ custom_css <- "
 # Helper Functions -------------------------------------------------------------
 
 # Function to generate a book container UI
-generate_book_container <- function(book, index) {
-  div(
-    class = "book-container",
-    fluidRow(
-      column(
-        4,
-        div(
-          class = "book-cover",
-          img(
-            src = book$Cover_URL,
-            alt = "Book Cover",
-            height = "200px",
-            width = "auto"
-          )
-        )
-      ),
-      column(
-        8,
-        div(
-          class = "book-details",
-          h4(class = "book-title", book$Title),
-          p(class = "book-author", paste("Author:", book$Author)),
-          p(class = "book-year", paste("Year of Publication:", book$Original.Publication.Year)),
-          p(paste("Total Pages:", book$Number.of.Pages)),
-          numericInput(
-            inputId = paste0("current_page_", index),
-            label = "Current Page:",
-            value = 0, # Default to 0
-            min = 0,
-            step = 1
-          ),
-          div(
-            class = "progress-bar-container",
-            uiOutput(paste0("reading_progress_", index))
-          )
-        )
-      )
-    )
-  )
-}
+
 
 # Function to calculate and render a progress bar
-render_progress_bar <- function(input, book, index) {
-  renderUI({
-    # Get total pages from the dataset
-    total_pages <- book$Number.of.Pages
 
-    # Get current page input, defaulting to 0 if empty or invalid
-    current_page <- tryCatch(
-      {
-        as.numeric(input[[paste0("current_page_", index)]])
-      },
-      error = function(e) {
-        0
-      }
-    )
-
-    # Ensure current_page is valid
-    if (is.na(current_page)) {
-      current_page <- 0
-    } else {
-      # Calculate progress
-      progress_value <- round((current_page / total_pages) * 100)
-
-      # Ensure progress_value is within 0-100
-      progress_value <- max(0, min(100, progress_value))
-
-      # Render progress bar
-      progressBar(
-        id = paste0("progress_", index),
-        value = progress_value,
-        total = 100,
-        display_pct = TRUE
-      )
-    }
-  })
-}
 
 # UI ---------------------------------------------------------------------------
 ui <- fluidPage(
