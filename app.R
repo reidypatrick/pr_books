@@ -46,31 +46,29 @@ server <- function(input, output, session) {
   })
 
   ## Novel Sections ------------------------------------------------------------
-  output$currently_reading_ui <- render_ui_novels_currently_reading(currently_reading)
-  output$want_to_read_ui <- render_ui_novels_want_to_read(novels)
-  output$read_ui <- render_ui_novels_read_ui(novels)
-  output$did_not_finish_ui <- render_ui_novels_did_not_finish_ui(novels)
-  
+  output$currently_reading_ui <- render_ui_currently_reading(currently_reading)
+  output$want_to_read_ui <- render_ui_want_to_read(novels)
+  output$read_ui <- render_ui_novels_read(novels)
+  output$did_not_finish_ui <- render_ui_did_not_finish(novels)
+
   ### Novel Progress Bars ------------------------------------------------------
   observe({
     lapply(seq_len(nrow(currently_reading)), function(i) {
       output[[paste0("reading_progress_", i)]] <- render_progress_bar(input, currently_reading[i, ], i)
     })
   })
-  
+
   ## Poetry Section ------------------------------------------------------------
   output$poetry_ui <- render_poetry_ui(poetry)
-  
+
   ## Short Fiction Section -----------------------------------------------------
   output$short_fiction_ui <- render_poetry_ui(short_fiction)
-  
+
   ## Drama Section -------------------------------------------------------------
   output$drama_ui <- render_poetry_ui(drama)
-  
+
   ## Non-Fiction Section -------------------------------------------------------
   output$non_fiction_ui <- render_poetry_ui(non_fiction)
-
-  
 }
 
 
