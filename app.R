@@ -8,6 +8,7 @@ source("R/scripting/custom_css.R")
 # Load Goodreads data ----------------------------------------------------------
 goodreads_data <- get_goodreads_data()
 novels <- filter_novels(goodreads_data)
+currently_reading <- filter_currently_reading(novels)
 poetry <- filter_poetry(goodreads_data)
 short_fiction <- filter_short_fiction(goodreads_data)
 drama <- filter_drama(goodreads_data)
@@ -30,7 +31,7 @@ ui <- fluidPage(
 
 # Server -----------------------------------------------------------------------
 server <- function(input, output, session) {
-  # Toggle sections ------------------------------------------------------------
+  ## Toggle sections ------------------------------------------------------------
   observeEvent(input$toggle_currently_reading, {
     toggle("currently_reading_section")
   })
@@ -45,16 +46,16 @@ server <- function(input, output, session) {
   })
 
   ## Novel Sections ---------------------------------------------------------
-  output$currently_reading_ui <- ui_novels_currently_reading(novels)
+  output$currently_reading_ui <- ui_novels_currently_reading(currently_reading)
   output$want_to_read_ui <- ui_novels_want_to_read(novels)
   output$read_ui <- ui_novels_read_ui(novels)
   output$did_not_finish_ui <- ui_novels_did_not_finish_ui(novels)
+  output$poetry_ui <- render_poetry_ui(poetry)
 
-
-  # Dynamically generate progress bars for each book
+  # Novel Progress Bars --------------------------------------------------------
   observe({
-    lapply(seq_len(nrow(goodreads_data)), function(i) {
-      output[[paste0("reading_progress_", i)]] <- render_progress_bar(input, goodreads_data[i, ], i)
+    lapply(seq_len(nrow(currently_reading)), function(i) {
+      output[[paste0("reading_progress_", i)]] <- render_progress_bar(input, currently_reading[i, ], i)
     })
   })
 }
