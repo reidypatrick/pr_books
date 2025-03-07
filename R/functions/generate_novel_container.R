@@ -1,4 +1,4 @@
-generate_book_container <- function(book, index) {
+generate_novel_container <- function(book, index) {
   div(
     class = "book-container",
     fluidRow(
