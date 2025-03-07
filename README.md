@@ -23,4 +23,14 @@ Drama
 
 Poetry
  - Checklist
+ 
+# TODO:
+  - dataset
+    - clean
+    - add progress
+   
+  - App Tools
+    - Update progress
+    - Change booktype
+   - sorting
 
