@@ -1,4 +1,4 @@
-render_ui_novels_want_to_read <- function(.novels) {
+render_ui_want_to_read <- function(.novels) {
   # TODO: Sort by preference
   renderUI({
     want_to_read <- .novels %>% filter(Bookshelves == "to-read")
