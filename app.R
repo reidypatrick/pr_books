@@ -46,10 +46,10 @@ server <- function(input, output, session) {
   })
 
   ## Novel Sections ---------------------------------------------------------
-  output$currently_reading_ui <- ui_novels_currently_reading(currently_reading)
-  output$want_to_read_ui <- ui_novels_want_to_read(novels)
-  output$read_ui <- ui_novels_read_ui(novels)
-  output$did_not_finish_ui <- ui_novels_did_not_finish_ui(novels)
+  output$currently_reading_ui <- render_ui_novels_currently_reading(currently_reading)
+  output$want_to_read_ui <- render_ui_novels_want_to_read(novels)
+  output$read_ui <- render_ui_novels_read_ui(novels)
+  output$did_not_finish_ui <- render_ui_novels_did_not_finish_ui(novels)
   output$poetry_ui <- render_poetry_ui(poetry)
 
   # Novel Progress Bars --------------------------------------------------------
