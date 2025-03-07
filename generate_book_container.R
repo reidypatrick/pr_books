@@ -22,7 +22,6 @@ generate_book_container <- function(book, index) {
           p(class = "book-author", paste("Author:", book$Author)),
           p(class = "book-year", paste("Year of Publication:", book$Original.Publication.Year)),
           p(paste("Total Pages:", book$Number.of.Pages)),
-          )
         )
       )
     )
