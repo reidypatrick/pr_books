@@ -1,4 +1,4 @@
-render_progress_bar <- function(input, book, index) {
+render_progress_bar <- function(book, index) {
   renderUI({
     # Get total pages from the dataset
     total_pages <- book$Number.of.Pages
@@ -6,7 +6,7 @@ render_progress_bar <- function(input, book, index) {
     # Get current page input, defaulting to 0 if empty or invalid
     current_page <- tryCatch(
       {
-        as.numeric(input[[paste0("current_page_", index)]])
+        as.numeric(book$Current.Page)
       },
       error = function(e) {
         0
