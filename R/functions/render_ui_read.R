@@ -1,4 +1,5 @@
 render_ui_novels_read <- function(.novels) {
+  #TODO sort by read date
   renderUI({
     read <- .novels %>% filter(Bookshelves == "read")
     if (nrow(read) > 0) {
