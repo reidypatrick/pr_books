@@ -1,6 +1,10 @@
 library(epubr)
 library(tidyverse)
 library(rvest)
+library(shiny)
+library(dplyr)
+library(shinyWidgets)
+library(shinyjs)
 
 # Source functions -------------------------------------------------------------
 source("R/functions/source_functions.R")

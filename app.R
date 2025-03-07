@@ -1,7 +1,3 @@
-library(shiny)
-library(dplyr)
-library(shinyWidgets)
-library(shinyjs)
 source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
@@ -62,13 +58,13 @@ server <- function(input, output, session) {
   output$poetry_ui <- render_poetry_ui(poetry)
 
   ## Short Fiction Section -----------------------------------------------------
-  output$short_fiction_ui <- render_poetry_ui(short_fiction)
+  output$short_fiction_ui <- render_short_fiction_ui(short_fiction)
 
   ## Drama Section -------------------------------------------------------------
-  output$drama_ui <- render_poetry_ui(drama)
+  output$drama_ui <- render_drama_ui(drama)
 
   ## Non-Fiction Section -------------------------------------------------------
-  output$non_fiction_ui <- render_poetry_ui(non_fiction)
+  output$non_fiction_ui <- render_non_fiction_ui(non_fiction)
 }
 
 
