@@ -27,19 +27,9 @@ ui <- fluidPage(
 
 # Server --------------------------------------------------------------------------------------------------------------
 server <- function(input, output, session) {
-  ## Toggle sections --------------------------------------------------------------------------------------------------
-  observeEvent(input$toggle_currently_reading, {
-    toggle("currently_reading_section")
-  })
-  observeEvent(input$toggle_read, {
-    toggle("read_section")
-  })
-  observeEvent(input$toggle_want_to_read, {
-    toggle("want_to_read_section")
-  })
-  observeEvent(input$toggle_did_not_finish, {
-    toggle("did_not_finish_section")
-  })
+  ## Set reactive values
+  reactive_data <- reactiveVal()
+  reactive_data(as.data.frame(currently_reading))
 
   ## Novel Sections ---------------------------------------------------------------------------------------------------
   output$currently_reading_ui <- render_ui_currently_reading(currently_reading)
@@ -49,10 +39,17 @@ server <- function(input, output, session) {
 
   ### Observe Novel Progress Bars -------------------------------------------------------------------------------------
   observe({
+    reactive_currently_reading <- reactive_data()
     lapply(seq_len(nrow(currently_reading)), function(i) {
-      output[[paste0("reading_progress_", i)]] <- render_progress_bar(input, currently_reading[i, ], i)
+      observeEvent(input[[paste0("current_page_", i)]], {
+        reactive_currently_reading$Current.Page[i] <- input[[paste0("current_page_", i)]]
+        output[[paste0("reading_progress_", i)]] <- render_progress_bar(reactive_currently_reading[i, ], i)
+        reactive_data(reactive_currently_reading) # Update the reactive object
+        cache <<- reactive_data()
+      })
     })
   })
+
 
   ## Poetry Section ---------------------------------------------------------------------------------------------------
   output$poetry_ui <- render_poetry_ui(poetry)
