@@ -1,4 +1,4 @@
-ui_novels_read_ui <- function(.novels) {
+render_ui_novels_read_ui <- function(.novels) {
   renderUI({
     read <- .novels %>% filter(Bookshelves == "read")
     if (nrow(read) > 0) {

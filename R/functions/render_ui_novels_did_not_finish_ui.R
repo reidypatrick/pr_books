@@ -1,4 +1,4 @@
-ui_novels_did_not_finish_ui <- function(.novels) {
+render_ui_novels_did_not_finish_ui <- function(.novels) {
   
   renderUI({
     did_not_finsih <- .novels %>% filter(Bookshelves == "did_not_finish")
