@@ -1,4 +1,4 @@
-generate_novel_container <- function(book, index) {
+generate_novel_container <- function(book) {
   div(
     class = "book-container",
     fluidRow(
@@ -23,14 +23,14 @@ generate_novel_container <- function(book, index) {
           p(class = "book-year", paste("Year of Publication:", book$Original.Publication.Year)),
           p(paste("Total Pages:", book$Number.of.Pages)),
           numericInput(
-            inputId = paste0("current_page_", index),
+            inputId = paste0("current_page_", book$Book.Id),
             label = "Current Page:",
-            value = 0, # Default to 0
+            value = book$Current.Page, # Default to 0
             min = 0,
             step = 1
           ),
           selectInput(
-            inputId = paste0("shelf_", index),
+            inputId = paste0("shelf_", book$Book.Id),
             label = "Shelf:",
             choices = c(
               "Currently Reading" = "currently-reading",
@@ -42,7 +42,7 @@ generate_novel_container <- function(book, index) {
           ),
           div(
             class = "progress-bar-container",
-            uiOutput(paste0("reading_progress_", index))
+            uiOutput(paste0("reading_progress_", book$Book.Id))
           )
         )
       )
