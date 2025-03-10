@@ -29,6 +29,17 @@ generate_novel_container <- function(book, index) {
             min = 0,
             step = 1
           ),
+          selectInput(
+            inputId = paste0("shelf_", index),
+            label = "Shelf:",
+            choices = c(
+              "Currently Reading" = "currently-reading",
+              "Want To Read" = "to-read",
+              "Read" = "read",
+              "Did Not Finish" = "did-not-finish"
+            ),
+            selected = book$Bookshelves # Default shelf (if provided in the book data)
+          ),
           div(
             class = "progress-bar-container",
             uiOutput(paste0("reading_progress_", index))
