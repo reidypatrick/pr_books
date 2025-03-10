@@ -4,7 +4,7 @@ render_ui_novels_read <- function(.data) {
     read <- .data %>% filter(Bookshelves == "read")
     if (nrow(read) > 0) {
       lapply(seq_len(nrow(read)), function(i) {
-        generate_book_container(read[i, ], i)
+        generate_book_container(read[i, ])
       })
     } else {
       p("Finsished Books will appear here.")

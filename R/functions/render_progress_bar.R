@@ -1,4 +1,4 @@
-render_progress_bar <- function(book, index) {
+render_progress_bar <- function(book) {
   renderUI({
     # Get total pages from the dataset
     total_pages <- book$Number.of.Pages
@@ -25,7 +25,7 @@ render_progress_bar <- function(book, index) {
 
       # Render progress bar
       progressBar(
-        id = paste0("progress_", index),
+        id = paste0("reading_progress_", book$Book.Id),
         value = progress_value,
         total = 100,
         display_pct = TRUE
