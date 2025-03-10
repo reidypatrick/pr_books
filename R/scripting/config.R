@@ -10,6 +10,7 @@ library(readr)
 # Set Options ------------------------------------------------------------------
 options(log_verbose = TRUE)
 options(r_functions_path = "R/functions")
+options(books_cache = FALSE)
 
 # Source functions -------------------------------------------------------------
 source("R/functions/source_functions.R")

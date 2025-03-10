@@ -1,4 +1,4 @@
-get_goodreads_data <- function(use_cache = FALSE) {
+get_goodreads_data <- function(use_cache = options$books_cache) {
   if (use_cache & exists("cache")) {
     goodreads_data <- cache
   } else {
