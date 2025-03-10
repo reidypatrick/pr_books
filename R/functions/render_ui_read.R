@@ -1,7 +1,7 @@
-render_ui_novels_read <- function(.novels) {
+render_ui_novels_read <- function(.data) {
   #TODO sort by read date
   renderUI({
-    read <- .novels %>% filter(Bookshelves == "read")
+    read <- .data %>% filter(Bookshelves == "read")
     if (nrow(read) > 0) {
       lapply(seq_len(nrow(read)), function(i) {
         generate_book_container(read[i, ], i)

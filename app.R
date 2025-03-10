@@ -28,14 +28,13 @@ ui <- fluidPage(
 # Server --------------------------------------------------------------------------------------------------------------
 server <- function(input, output, session) {
   ## Set reactive values
-  reactive_data <- reactiveVal()
-  reactive_data(as.data.frame(currently_reading))
+  reactive_data <- reactiveVal(as.data.frame(goodreads_data))
 
-  ## Novel Sections ---------------------------------------------------------------------------------------------------
-  output$currently_reading_ui <- render_ui_currently_reading(currently_reading)
-  output$want_to_read_ui <- render_ui_want_to_read(novels)
-  output$read_ui <- render_ui_novels_read(novels)
-  output$did_not_finish_ui <- render_ui_did_not_finish(novels)
+  ## Novel Section ---------------------------------------------------------------------------------------------------
+  output$currently_reading_ui <- render_ui_currently_reading(reactive_data)
+  output$want_to_read_ui <- render_ui_want_to_read(reactive_data)
+  output$read_ui <- render_ui_novels_read(reactive_data)
+  output$did_not_finish_ui <- render_ui_did_not_finish(reactive_data)
 
   ### Observe Novel Progress Bars -------------------------------------------------------------------------------------
   observe({
@@ -47,6 +46,13 @@ server <- function(input, output, session) {
         reactive_data(reactive_currently_reading) # Update the reactive object
         cache <<- reactive_data()
       })
+      
+      # observeEvent(input[[paste0("shelf", i)]], {
+      #   reactive_currently_reading$Current.Page[i] <- input[[paste0("current_page_", i)]]
+      #   output[[paste0("reading_progress_", i)]] <- render_progress_bar(reactive_currently_reading[i, ], i)
+      #   reactive_data(reactive_currently_reading) # Update the reactive object
+      #   cache <<- reactive_data()
+      # })
     })
   })
 
