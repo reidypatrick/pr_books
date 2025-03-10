@@ -3,12 +3,6 @@ source("R/scripting/custom_css.R")
 
 # Load Goodreads data -------------------------------------------------------------------------------------------------
 goodreads_data <- get_goodreads_data()
-novels <- filter_novels(goodreads_data)
-currently_reading <- filter_currently_reading(novels)
-poetry <- filter_poetry(goodreads_data)
-short_fiction <- filter_short_fiction(goodreads_data)
-drama <- filter_drama(goodreads_data)
-non_fiction <- filter_non_fiction(goodreads_data)
 
 # UI ------------------------------------------------------------------------------------------------------------------
 
@@ -31,30 +25,41 @@ server <- function(input, output, session) {
   reactive_data <- reactiveVal(as.data.frame(goodreads_data))
 
   ## Novel Section ---------------------------------------------------------------------------------------------------
-  output$currently_reading_ui <- render_ui_currently_reading(reactive_data)
-  output$want_to_read_ui <- render_ui_want_to_read(reactive_data)
-  output$read_ui <- render_ui_novels_read(reactive_data)
-  output$did_not_finish_ui <- render_ui_did_not_finish(reactive_data)
+  output$currently_reading_ui <- render_ui_currently_reading(goodreads_data)
+  output$want_to_read_ui <- render_ui_want_to_read(goodreads_data)
+  output$read_ui <- render_ui_novels_read(goodreads_data)
+  output$did_not_finish_ui <- render_ui_did_not_finish(goodreads_data)
 
-  ### Observe Novel Progress Bars -------------------------------------------------------------------------------------
+  ### Observe reactive elements ---------------------------------------------------------------------------------------
   observe({
-    reactive_currently_reading <- reactive_data()
-    lapply(seq_len(nrow(currently_reading)), function(i) {
-      observeEvent(input[[paste0("current_page_", i)]], {
-        reactive_currently_reading$Current.Page[i] <- input[[paste0("current_page_", i)]]
-        output[[paste0("reading_progress_", i)]] <- render_progress_bar(reactive_currently_reading[i, ], i)
-        reactive_data(reactive_currently_reading) # Update the reactive object
-        cache <<- reactive_data()
+    data <- reactive_data()
+    #### Observe Shelves ----------------------------------------------------------------------------------------------
+    lapply(seq_along(data$Book.Id), function(i) {
+      observeEvent(input[[paste0("shelf_", data$Book.Id[i])]], {
+        data <- reactive_data()
+        data$Bookshelves[i] <- input[[paste0("shelf_", data$Book.Id[i])]]
+        reactive_data(data)
+        
+        output$currently_reading_ui <- render_ui_currently_reading(data)
+        output$want_to_read_ui <- render_ui_want_to_read(data)
+        output$read_ui <- render_ui_novels_read(data)
+        output$did_not_finish_ui <- render_ui_did_not_finish(data)
       })
-      
-      # observeEvent(input[[paste0("shelf", i)]], {
-      #   reactive_currently_reading$Current.Page[i] <- input[[paste0("current_page_", i)]]
-      #   output[[paste0("reading_progress_", i)]] <- render_progress_bar(reactive_currently_reading[i, ], i)
-      #   reactive_data(reactive_currently_reading) # Update the reactive object
-      #   cache <<- reactive_data()
-      # })
+    })
+    
+    #### Observe Novel Progress Bars -----------------------------------------------------------------------------------
+    lapply(seq_along(data$Book.Id), function(i) {
+      observeEvent(input[[paste0("current_page_", data$Book.Id[i])]], {
+        data <- reactive_data()
+        data$Current.Page[i] <- input[[paste0("current_page_", data$Book.Id[i])]]
+        reactive_data(data)
+        output[[paste0("reading_progress_", data$Book.Id[i])]] <- render_progress_bar(data[i, ])
+      })
     })
   })
+  
+
+
 
 
   ## Poetry Section ---------------------------------------------------------------------------------------------------
