@@ -5,6 +5,7 @@ library(shiny)
 library(dplyr)
 library(shinyWidgets)
 library(shinyjs)
+library(readr)
 
 # Set Options ------------------------------------------------------------------
 options(log_verbose = TRUE)
