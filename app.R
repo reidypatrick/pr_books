@@ -2,7 +2,7 @@ source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
 # Load Goodreads data -------------------------------------------------------------------------------------------------
-goodreads_data <- get_goodreads_data(use_cache = FALSE)
+goodreads_data <- get_goodreads_data(use_cache = TRUE)
 
 # UI ------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ server <- function(input, output, session) {
   ## Set reactive values
   reactive_data <- reactiveVal(as.data.frame(goodreads_data))
 
-  ## Novel Section ---------------------------------------------------------------------------------------------------
+  ## Novel Section ----------------------------------------------------------------------------------------------------
   output$currently_reading_ui <- render_ui_currently_reading(goodreads_data)
   output$want_to_read_ui <- render_ui_want_to_read(goodreads_data)
   output$read_ui <- render_ui_novels_read(goodreads_data)
@@ -49,7 +49,7 @@ server <- function(input, output, session) {
       })
     })
 
-    #### Observe Novel Progress Bars -----------------------------------------------------------------------------------
+    #### Observe Novel Progress Bars ----------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("current_page_", data$Book.Id[i])]], {
         data <- reactive_data()
@@ -62,16 +62,16 @@ server <- function(input, output, session) {
   })
 
   ## Poetry Section ---------------------------------------------------------------------------------------------------
-  output$poetry_ui <- render_poetry_ui(poetry)
+  output$poetry_ui <- render_poetry_ui(goodreads_data)
 
   ## Short Fiction Section --------------------------------------------------------------------------------------------
-  output$short_fiction_ui <- render_short_fiction_ui(short_fiction)
+  output$short_fiction_ui <- render_short_fiction_ui(goodreads_data)
 
   ## Drama Section ----------------------------------------------------------------------------------------------------
-  output$drama_ui <- render_drama_ui(drama)
+  output$drama_ui <- render_drama_ui(goodreads_data)
 
   ## Non-Fiction Section ----------------------------------------------------------------------------------------------
-  output$non_fiction_ui <- render_non_fiction_ui(non_fiction)
+  output$non_fiction_ui <- render_non_fiction_ui(goodreads_data)
 }
 
 
