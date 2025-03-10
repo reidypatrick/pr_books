@@ -1,4 +1,4 @@
-generate_book_container <- function(book, index) {
+generate_book_container <- function(book) {
   div(
     class = "book-container",
     fluidRow(
@@ -22,6 +22,17 @@ generate_book_container <- function(book, index) {
           p(class = "book-author", paste("Author:", book$Author)),
           p(class = "book-year", paste("Year of Publication:", book$Original.Publication.Year)),
           p(paste("Total Pages:", book$Number.of.Pages)),
+          selectInput(
+            inputId = paste0("shelf_", book$Book.Id),
+            label = "Shelf:",
+            choices = c(
+              "Currently Reading" = "currently-reading",
+              "Want To Read" = "to-read",
+              "Read" = "read",
+              "Did Not Finish" = "did-not-finish"
+            ),
+            selected = book$Bookshelves # Default shelf (if provided in the book data)
+          ),
         )
       )
     )
