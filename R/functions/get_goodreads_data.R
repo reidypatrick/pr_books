@@ -1,5 +1,5 @@
 get_goodreads_data <- function(use_cache = options$books_cache) {
-  if (use_cache & exists("cache")) {
+  if (use_cache && exists("cache")) {
     goodreads_data <- cache
   } else {
     read_csv(goodreads_file_path) %>%
