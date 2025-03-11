@@ -1,4 +1,5 @@
-render_non_fiction_ui <- function(.non_fiction) {
+render_non_fiction_ui <- function(.data) {
+  .non_fiction <- filter_non_fiction(.data)
   renderUI({
     if (nrow(.non_fiction) > 0) {
       lapply(seq_len(nrow(.non_fiction)), function(i) {

@@ -1,4 +1,4 @@
-generate_novel_container <- function(book, index) {
+generate_novel_container <- function(book) {
   div(
     class = "book-container",
     fluidRow(
@@ -11,6 +11,16 @@ generate_novel_container <- function(book, index) {
             alt = "Book Cover",
             height = "200px",
             width = "auto"
+          ),
+          br(),
+          actionButton(
+            input = paste0("show_text_dialog_", book$Book.Id),
+            label = "Edit Cover"
+          ),
+          br(),
+          actionButton(
+            input = paste0("show_numeric_dialog_", book$Book.Id),
+            label = "Edit Pages"
           )
         )
       ),
@@ -23,15 +33,28 @@ generate_novel_container <- function(book, index) {
           p(class = "book-year", paste("Year of Publication:", book$Original.Publication.Year)),
           p(paste("Total Pages:", book$Number.of.Pages)),
           numericInput(
-            inputId = paste0("current_page_", index),
+            inputId = paste0("current_page_", book$Book.Id),
             label = "Current Page:",
-            value = 0, # Default to 0
+            value = book$Current.Page, # Default to 0
             min = 0,
             step = 1
           ),
+          div(class = "dark-select",
+            selectInput(
+              inputId = paste0("shelf_", book$Book.Id),
+              label = "Shelf:",
+              choices = c(
+                "Currently Reading" = "currently-reading",
+                "Want To Read" = "to-read",
+                "Read" = "read",
+                "Did Not Finish" = "did-not-finish"
+              ),
+              selected = book$Bookshelves # Default shelf (if provided in the book data)
+            )
+          ),
           div(
             class = "progress-bar-container",
-            uiOutput(paste0("reading_progress_", index))
+            uiOutput(paste0("reading_progress_", book$Book.Id))
           )
         )
       )

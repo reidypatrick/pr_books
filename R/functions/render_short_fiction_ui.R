@@ -1,4 +1,5 @@
-render_short_fiction_ui <- function(.short_fiction) {
+render_short_fiction_ui <- function(.data) {
+  .short_fiction <- filter_short_fiction(.data)
   renderUI({
     if (nrow(.short_fiction) > 0) {
       lapply(seq_len(nrow(.short_fiction)), function(i) {

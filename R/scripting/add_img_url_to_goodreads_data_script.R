@@ -28,3 +28,18 @@ write_csv(goodreads_data, file = "data/input/goodreads_data.csv")
 goodreads_data <- goodreads_data %>%
   mutate(Cover_URL = Cover_URL.1) %>%
   select(-Cover_URL.1)
+
+
+
+
+
+for (i in seq_len(nrow(goodreads_data))) {
+  download.file(
+    goodreads_data$Cover_URL[i],
+    paste0("data/figures/", goodreads_data$Book.Id[i], ".jpg"), 
+    mode = "wb"
+  )
+}
+
+filter(goodreads_data, Book.Id == 12505)
+cache[84, ]$Cover_URL <- "https://img.hardcover.app/enlarge?url=https://assets.hardcover.app/books/7490/8848836260819350.jpg&width=270&height=416&type=webp"
