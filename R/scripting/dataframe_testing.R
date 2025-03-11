@@ -15,10 +15,10 @@ non_fiction <- filter_non_fiction(goodreads_data)
 
 list.files("data/epub")
 
-murakami_1 <- epub("data/epub/Murakami, Haruki - Men Without Women_ Stories.epub")$data[[1]] %>% 
+murakami_1 <- epub("data/epub/Murakami, Haruki - Men Without Women_ Stories.epub")$data[[1]] %>%
   filter(section == "inlinetoc")
 
-hemingway_1 <- epub("data/epub/HEMINGWAY.epub")$data[[1]] %>% 
+hemingway_1 <- epub("data/epub/HEMINGWAY.epub")$data[[1]] %>%
   filter(section == "id1110")
 
 
@@ -28,4 +28,3 @@ cat(book_toc$text)
 
 
 short_fiction
-
