@@ -7,7 +7,7 @@ goodreads_data <- get_goodreads_data(use_cache = TRUE)
 # UI ------------------------------------------------------------------------------------------------------------------
 
 ui <- fluidPage(
-  useShinyjs(), # Initialize shinyjs
+  useShinyjs(),
   tags$head(tags$style(HTML(custom_css))),
   titlePanel("Book Categories"),
   tabsetPanel(
@@ -21,7 +21,7 @@ ui <- fluidPage(
 
 # Server --------------------------------------------------------------------------------------------------------------
 server <- function(input, output, session) {
-  ## Set reactive values
+  ## Set reactive values ----------------------------------------------------------------------------------------------
   reactive_data <- reactiveVal(as.data.frame(goodreads_data))
 
   ## Novel Section ----------------------------------------------------------------------------------------------------
@@ -30,10 +30,22 @@ server <- function(input, output, session) {
   output$read_ui <- render_ui_novels_read(goodreads_data)
   output$did_not_finish_ui <- render_ui_did_not_finish(goodreads_data)
 
-  ### Observe reactive elements ---------------------------------------------------------------------------------------
+  ## Poetry Section ---------------------------------------------------------------------------------------------------
+  output$poetry_ui <- render_poetry_ui(goodreads_data)
+
+  ## Short Fiction Section --------------------------------------------------------------------------------------------
+  output$short_fiction_ui <- render_short_fiction_ui(goodreads_data)
+
+  ## Drama Section ----------------------------------------------------------------------------------------------------
+  output$drama_ui <- render_drama_ui(goodreads_data)
+
+  ## Non-Fiction Section ----------------------------------------------------------------------------------------------
+  output$non_fiction_ui <- render_non_fiction_ui(goodreads_data)
+
+  ## Observe reactive elements ----------------------------------------------------------------------------------------
   observe({
     data <- reactive_data()
-    #### Observe Shelves ----------------------------------------------------------------------------------------------
+    ### Observe Shelves -----------------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("shelf_", data$Book.Id[i])]], {
         data <- reactive_data()
@@ -49,7 +61,7 @@ server <- function(input, output, session) {
       })
     })
 
-    #### Observe Novel Progress Bars ----------------------------------------------------------------------------------
+    ### Observe Novel Progress Bars -----------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("current_page_", data$Book.Id[i])]], {
         data <- reactive_data()
@@ -59,22 +71,72 @@ server <- function(input, output, session) {
         cache <<- data
       })
     })
+
+
+    ### Observe Edit Page Count ---------------------------------------------------------------------------------------
+    lapply(seq_along(data$Book.Id), function(i) {
+      observeEvent(input[[paste0("show_numeric_dialog_", data$Book.Id[i])]], {
+        showModal(modalDialog(
+          title = "Edit Page Count",
+          numericInput(
+            inputId = paste0("page_count_", data$Book.Id[i]),
+            label = "Page Count",
+            value = 0
+          ),
+          footer = tagList(
+            modalButton("Cancel"),
+            actionButton(
+              input = paste0("submit_page_count_", data$Book.Id[i]),
+              label = "Submit"
+            )
+          )
+        ))
+      })
+    })
+
+    ### Observe Edit Cover --------------------------------------------------------------------------------------------
+    lapply(seq_along(data$Book.Id), function(i) {
+      observeEvent(input[[paste0("show_text_dialog_", data$Book.Id[i])]], {
+        showModal(modalDialog(
+          title = "Enter Text",
+          textInput(
+            inputId = paste0("cover_url_", data$Book.Id[i]),
+            label = "Cover URL"
+          ),
+          footer = tagList(
+            modalButton("Cancel"),
+            actionButton(
+              input = paste0("submit_cover_url_", data$Book.Id[i]),
+              label = "Submit"
+            )
+          )
+        ))
+      })
+    })
+
+    ### Observe New Page Count ----------------------------------------------------------------------------------------
+    lapply(seq_along(data$Book.Id), function(i) {
+      observeEvent(input[[paste0("submit_page_count_", data$Book.Id[i])]], {
+        data <- reactive_data()
+        data$Number.of.Pages[i] <- input[[paste0("page_count_", data$Book.Id[i])]]
+        reactive_data(data)
+        cache <<- data
+        removeModal()
+      })
+    })
+
+    ### Observe New Cover ---------------------------------------------------------------------------------------------
+    lapply(seq_along(data$Book.Id), function(i) {
+      observeEvent(input[[paste0("submit_cover_url_", data$Book.Id[i])]], {
+        data <- reactive_data()
+        data$Cover_URL[i] <- input[[paste0("cover_url_", data$Book.Id[i])]]
+        reactive_data(data)
+        cache <<- data
+        removeModal()
+      })
+    })
   })
-
-  ## Poetry Section ---------------------------------------------------------------------------------------------------
-  output$poetry_ui <- render_poetry_ui(goodreads_data)
-
-  ## Short Fiction Section --------------------------------------------------------------------------------------------
-  output$short_fiction_ui <- render_short_fiction_ui(goodreads_data)
-
-  ## Drama Section ----------------------------------------------------------------------------------------------------
-  output$drama_ui <- render_drama_ui(goodreads_data)
-
-  ## Non-Fiction Section ----------------------------------------------------------------------------------------------
-  output$non_fiction_ui <- render_non_fiction_ui(goodreads_data)
 }
-
-
 
 # Run App -------------------------------------------------------------------------------------------------------------
 shinyApp(ui = ui, server = server)
