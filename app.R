@@ -2,7 +2,8 @@ source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
 # Load Goodreads data -------------------------------------------------------------------------------------------------
-goodreads_data <- get_goodreads_data(use_cache = TRUE)
+goodreads_data <- get_goodreads_data(use_cache = FALSE)
+temp_activity_data <- get_temp_activity_data()
 
 # UI ------------------------------------------------------------------------------------------------------------------
 
@@ -25,6 +26,7 @@ server <- function(input, output, session) {
   reactive_data <- reactiveVal(as.data.frame(goodreads_data))
 
   ## Novel Section ----------------------------------------------------------------------------------------------------
+  output$activity_grid <- render_activity_grid(temp_activity_data)
   output$currently_reading_ui <- render_ui_currently_reading(goodreads_data)
   output$want_to_read_ui <- render_ui_want_to_read(goodreads_data)
   output$read_ui <- render_ui_novels_read(goodreads_data)
@@ -51,12 +53,12 @@ server <- function(input, output, session) {
         data <- reactive_data()
         data$Bookshelves[i] <- input[[paste0("shelf_", data$Book.Id[i])]]
         reactive_data(data)
-
+        
         output$currently_reading_ui <- render_ui_currently_reading(data)
         output$want_to_read_ui <- render_ui_want_to_read(data)
         output$read_ui <- render_ui_novels_read(data)
         output$did_not_finish_ui <- render_ui_did_not_finish(data)
-
+        
         cache <<- data
       })
     })
@@ -71,8 +73,7 @@ server <- function(input, output, session) {
         cache <<- data
       })
     })
-
-
+    
     ### Observe Edit Page Count ---------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_numeric_dialog_", data$Book.Id[i])]], {
@@ -93,7 +94,7 @@ server <- function(input, output, session) {
         ))
       })
     })
-
+    
     ### Observe Edit Cover --------------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_text_dialog_", data$Book.Id[i])]], {
@@ -113,7 +114,7 @@ server <- function(input, output, session) {
         ))
       })
     })
-
+    
     ### Observe New Page Count ----------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_page_count_", data$Book.Id[i])]], {
@@ -124,7 +125,7 @@ server <- function(input, output, session) {
         removeModal()
       })
     })
-
+    
     ### Observe New Cover ---------------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_cover_url_", data$Book.Id[i])]], {
@@ -135,6 +136,27 @@ server <- function(input, output, session) {
         removeModal()
       })
     })
+
+    ### Observe Edit Dates Read ---------------------------------------------------------------------------------------
+    # lapply(seq_along(data$Book.Id), function(i) {
+    #   observeEvent(input[[paste0("show_numeric_dialog_", data$Book.Id[i])]], {
+    #     showModal(modalDialog(
+    #       title = "Edit Page Count",
+    #       numericInput(
+    #         inputId = paste0("page_count_", data$Book.Id[i]),
+    #         label = "Page Count",
+    #         value = 0
+    #       ),
+    #       footer = tagList(
+    #         modalButton("Cancel"),
+    #         actionButton(
+    #           input = paste0("submit_page_count_", data$Book.Id[i]),
+    #           label = "Submit"
+    #         )
+    #       )
+    #     ))
+    #   })
+    # })
   })
 }
 
