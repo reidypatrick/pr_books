@@ -17,4 +17,5 @@ source("R/functions/source_functions.R")
 source_functions()
 
 # Set Global Variables ---------------------------------------------------------
-goodreads_file_path <- "data/input/goodreads_data.csv"
+goodreads_file_path <- "data/output/cache2025-03-11.csv"
+activity_file_path <- "data/output/activity_data.csv"
