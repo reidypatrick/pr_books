@@ -53,12 +53,12 @@ server <- function(input, output, session) {
         data <- reactive_data()
         data$Bookshelves[i] <- input[[paste0("shelf_", data$Book.Id[i])]]
         reactive_data(data)
-        
+
         output$currently_reading_ui <- render_ui_currently_reading(data)
         output$want_to_read_ui <- render_ui_want_to_read(data)
         output$read_ui <- render_ui_novels_read(data)
         output$did_not_finish_ui <- render_ui_did_not_finish(data)
-        
+
         cache <<- data
       })
     })
@@ -73,7 +73,7 @@ server <- function(input, output, session) {
         cache <<- data
       })
     })
-    
+
     ### Observe Edit Page Count ---------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_numeric_dialog_", data$Book.Id[i])]], {
@@ -94,7 +94,7 @@ server <- function(input, output, session) {
         ))
       })
     })
-    
+
     ### Observe Edit Cover --------------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_text_dialog_", data$Book.Id[i])]], {
@@ -114,7 +114,7 @@ server <- function(input, output, session) {
         ))
       })
     })
-    
+
     ### Observe New Page Count ----------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_page_count_", data$Book.Id[i])]], {
@@ -125,7 +125,7 @@ server <- function(input, output, session) {
         removeModal()
       })
     })
-    
+
     ### Observe New Cover ---------------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_cover_url_", data$Book.Id[i])]], {

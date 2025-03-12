@@ -37,11 +37,11 @@ render_activity_grid <- function(data) {
                 date <- day_data$date[1]
                 # Map value to a color gradient
                 color <- rgb(
-                  red = 33, 
-                  green = min(100 + (value * 5), 255),  # Increase green based on value
-                  blue = 57, 
-                  maxColorValue = 255, 
-                  alpha = value * 25  # Adjust alpha based on value
+                  red = 33,
+                  green = min(100 + (value * 5), 255), # Increase green based on value
+                  blue = 57,
+                  maxColorValue = 255,
+                  alpha = value * 25 # Adjust alpha based on value
                 )
                 # Add a tooltip with the date and value
                 div(

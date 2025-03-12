@@ -63,7 +63,7 @@ server <- function(input, output, session) {
   data <- data.frame(date = dates, value = values) %>%
     mutate( # get weeks from today
       week = as.numeric(floor(difftime(today(), date, units = "weeks")))
-    ) %>% 
+    ) %>%
     mutate( # set day as factor
       day = factor(
         weekdays(date),

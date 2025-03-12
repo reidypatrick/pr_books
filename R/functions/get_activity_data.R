@@ -1,7 +1,6 @@
 get_activity_data <- function(
     use_cache = getOption("books_cache"),
-    activity_file_path = "data/output/activity_data.csv"
-    ) {
+    activity_file_path = "data/output/activity_data.csv") {
   if (use_cache) {
     read_csv(activity_file_path)
   } else {
