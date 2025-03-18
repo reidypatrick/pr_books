@@ -173,37 +173,36 @@ custom_css <- "
         flex-direction: row;
         gap: 10px;
       }
-      .y-axis-labels {
-        display: flex;
-        flex-direction: column;
-        gap: 0px;
-        justify-content: space-between;
-        padding-top: 0px;  /* Align labels with cells */
-      }
-      .y-axis-label {
-        height: 15px;
-        text-align: right;
-        padding-right: 5px;
-        font-size: 12px;
-      }
-      .activity-grid {
-        display: flex;
-        flex-direction: row;
-        gap: 2px;
-      }
-      .activity-column {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-      .activity-cell {
-        width: 15px;
-        height: 15px;
-        background-color: #ebedf0;
-        border-radius: 3px;
-      }
-      .activity-cell:hover {
-        border: 1px solid black;
-      }
+  .y-axis-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    justify-content: space-between;
+    padding-top: 0px;  /* Align labels with cells */
+  }
+  .y-axis-label {
+    height: 15px;
+    text-align: right;
+    padding-right: 5px;
+    font-size: 12px;
+  }
+  .activity-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+  }
+  .activity-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .activity-cell {
+    width: 15px;
+    height: 15px;
+    background-color: #ebedf0;
+    border-radius: 3px;
+  }
+  .activity-cell:hover {
+    border: 1px solid black;
 }
 "
