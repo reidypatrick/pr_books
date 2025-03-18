@@ -4,7 +4,7 @@ activity_data <- data.frame(
   no_of_pages = c(44, 16)
 )
 
-write_csv(activity_data, "data/output/activity_cache.csv")
+write_csv(activity_data, "data/output/cache_activity.csv")
 
 activity_data
 
