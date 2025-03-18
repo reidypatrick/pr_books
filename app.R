@@ -29,21 +29,21 @@ server <- function(input, output, session) {
   ## 210 Set reactive values ------------------------------------------------------------------------------------------
   reactive_data <- reactiveVal(as.data.frame(goodreads_data))
   reactive_activity <- reactiveVal(as.data.frame(activity_data))
-  
+
   ## 220 Get UI -------------------------------------------------------------------------------------------------------
   ### 221 Novel Section -----------------------------------------------------------------------------------------------
   output$currently_reading_ui <- render_ui_currently_reading(goodreads_data)
   output$want_to_read_ui <- render_ui_want_to_read(goodreads_data)
   output$read_ui <- render_ui_novels_read(goodreads_data)
   output$did_not_finish_ui <- render_ui_did_not_finish(goodreads_data)
-  
+
   #### 221.1 Activity Grids -------------------------------------------------------------------------------------------
-  currently_reading <- goodreads_data %>%  filter(Bookshelves == "currently-reading")
+  currently_reading <- goodreads_data %>% filter(Bookshelves == "currently-reading")
   lapply(seq_len(nrow(currently_reading)), function(i) {
     book <- currently_reading[i, ]
     output[[paste0("activity_grid_", book$Book.Id)]] <- render_activity_grid(book, activity_data)
   })
-  
+
 
   ### 222 Poetry Section -----------------------------------------------------------------------------------------------
   output$poetry_ui <- render_poetry_ui(goodreads_data)
@@ -60,7 +60,7 @@ server <- function(input, output, session) {
   ## 230 Observe reactive elements ------------------------------------------------------------------------------------
   observe({
     data <- reactive_data()
-    
+
     ### 231 Observe Shelves -------------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("shelf_", data$Book.Id[i])]], {
@@ -88,7 +88,7 @@ server <- function(input, output, session) {
       })
     })
 
-    ### 233 Observe Edit Page Count ---------------------------------------------------------------------------------------
+    ### 233 Observe Edit Page Count -----------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_numeric_dialog_", data$Book.Id[i])]], {
         showModal(modalDialog(
@@ -109,7 +109,7 @@ server <- function(input, output, session) {
       })
     })
 
-    ### 234 Observe Edit Cover --------------------------------------------------------------------------------------------
+    ### 234 Observe Edit Cover ----------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_text_dialog_", data$Book.Id[i])]], {
         showModal(modalDialog(
@@ -129,7 +129,7 @@ server <- function(input, output, session) {
       })
     })
 
-    ### 235 Observe New Page Count ----------------------------------------------------------------------------------------
+    ### 235 Observe New Page Count ------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_page_count_", data$Book.Id[i])]], {
         data <- reactive_data()
@@ -140,7 +140,7 @@ server <- function(input, output, session) {
       })
     })
 
-    ### 236 Observe New Cover ---------------------------------------------------------------------------------------------
+    ### 236 Observe New Cover -----------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_cover_url_", data$Book.Id[i])]], {
         data <- reactive_data()
@@ -151,7 +151,7 @@ server <- function(input, output, session) {
       })
     })
 
-    ### 237 Observe Edit Dates Read ---------------------------------------------------------------------------------------
+    ### 237 Observe Edit Dates Read -----------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_edit_dates_", data$Book.Id[i])]], {
         showModal(modalDialog(
@@ -160,18 +160,18 @@ server <- function(input, output, session) {
             input = paste0("date_read_", data$Book.Id[i]),
             label = "Select a date:",
             value = Sys.Date()
-          ), 
+          ),
           numericInput(
             input = paste0("pages_read_", data$Book.Id[i]),
             label = "Enter a number:",
             value = 0
-          ), 
+          ),
           footer = tagList(
             modalButton("Cancel"),
             actionButton(
               paste0("submit_dates_read_", data$Book.Id[i]),
               label = "Submit"
-            ) 
+            )
           )
         ))
       })
@@ -182,25 +182,23 @@ server <- function(input, output, session) {
       observeEvent(input[[paste0("submit_dates_read_", data$Book.Id[i])]], {
         activity <- reactive_activity()
         data <- reactive_data()
-        
-        activity <- activity %>% 
+
+        activity <- activity %>%
           add_row(
             book_id = data$Book.Id[i],
             date = input[[paste0("date_read_", data$Book.Id[i])]],
             no_of_pages = input[[paste0("pages_read_", data$Book.Id[i])]]
           )
-        
+
         output[[paste0("activity_grid_", data$Book.Id[i])]] <- render_activity_grid(data[i, ], activity)
-        
+
         cache[["activity"]] <<- activity
         removeModal()
         isolate(reactive_activity(activity))
       })
     })
     ### 239 Observe Activity Update -----------------------------------------------------------------------------------
-    
   })
-  
 }
 
 # 300 Run App ---------------------------------------------------------------------------------------------------------
