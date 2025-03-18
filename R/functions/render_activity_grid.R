@@ -5,7 +5,7 @@ render_activity_grid <- function(book, activity) {
       group_by(date) %>%
       summarise(no_of_pages = sum(no_of_pages))
 
-    dates <- seq(Sys.Date() - days(182), Sys.Date(), by = "day")
+    dates <- seq(Sys.Date() - days(161), Sys.Date(), by = "day")
 
 
     book_data <- as.data.frame(dates) %>%
@@ -28,12 +28,12 @@ render_activity_grid <- function(book, activity) {
         )
       )
 
-    weeks <- split(data, data$week)
+    weeks <- split(book_data, book_data$week)
 
     # Create y-axis labels for Mon, Wed, Fri
     y_axis_labels <- div(
       class = "y-axis-labels",
-      lapply(levels(data$day), function(day) {
+      lapply(levels(book_data$day), function(day) {
         if (day == "Monday") {
           div(class = "y-axis-label", "Mon")
         } else if (day == "Wednesday") {
@@ -55,7 +55,7 @@ render_activity_grid <- function(book, activity) {
         div(
           class = "activity-column",
           lapply(
-            levels(data$day), function(day) { # Use levels(data$day) to maintain order
+            levels(book_data$day), function(day) { # Use levels(data$day) to maintain order
               # Filter data for the current day
               day_data <- week_data[week_data$day == day, ]
               # Create a cell for the day (if data exists)
