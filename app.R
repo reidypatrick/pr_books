@@ -1,10 +1,15 @@
 source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
-# Load Goodreads data -------------------------------------------------------------------------------------------------
+# 000 Load Goodreads data ---------------------------------------------------------------------------------------------
 goodreads_data <- get_goodreads_data(use_cache = TRUE)
+activity_data <- get_activity_data(use_cache = TRUE)
+cache <- list()
+cache[["data"]] <- goodreads_data
+cache[["activity"]] <- activity_data
 
-# UI ------------------------------------------------------------------------------------------------------------------
+
+# 100 UI --------------------------------------------------------------------------------------------------------------
 
 ui <- fluidPage(
   useShinyjs(),
@@ -19,33 +24,44 @@ ui <- fluidPage(
   )
 )
 
-# Server --------------------------------------------------------------------------------------------------------------
+# 200 Server ----------------------------------------------------------------------------------------------------------
 server <- function(input, output, session) {
-  ## Set reactive values ----------------------------------------------------------------------------------------------
+  ## 210 Set reactive values ------------------------------------------------------------------------------------------
   reactive_data <- reactiveVal(as.data.frame(goodreads_data))
+  reactive_activity <- reactiveVal(as.data.frame(activity_data))
 
-  ## Novel Section ----------------------------------------------------------------------------------------------------
+  ## 220 Get UI -------------------------------------------------------------------------------------------------------
+  ### 221 Novel Section -----------------------------------------------------------------------------------------------
   output$currently_reading_ui <- render_ui_currently_reading(goodreads_data)
   output$want_to_read_ui <- render_ui_want_to_read(goodreads_data)
   output$read_ui <- render_ui_novels_read(goodreads_data)
   output$did_not_finish_ui <- render_ui_did_not_finish(goodreads_data)
 
-  ## Poetry Section ---------------------------------------------------------------------------------------------------
+  #### 221.1 Activity Grids -------------------------------------------------------------------------------------------
+  currently_reading <- goodreads_data %>% filter(Bookshelves == "currently-reading")
+  lapply(seq_len(nrow(currently_reading)), function(i) {
+    book <- currently_reading[i, ]
+    output[[paste0("activity_grid_", book$Book.Id)]] <- render_activity_grid(book, activity_data)
+  })
+
+
+  ### 222 Poetry Section -----------------------------------------------------------------------------------------------
   output$poetry_ui <- render_poetry_ui(goodreads_data)
 
-  ## Short Fiction Section --------------------------------------------------------------------------------------------
+  ### 223 Short Fiction Section ----------------------------------------------------------------------------------------
   output$short_fiction_ui <- render_short_fiction_ui(goodreads_data)
 
-  ## Drama Section ----------------------------------------------------------------------------------------------------
+  ### 224 Drama Section ------------------------------------------------------------------------------------------------
   output$drama_ui <- render_drama_ui(goodreads_data)
 
-  ## Non-Fiction Section ----------------------------------------------------------------------------------------------
+  ### 225 Non-Fiction Section ------------------------------------------------------------------------------------------
   output$non_fiction_ui <- render_non_fiction_ui(goodreads_data)
 
-  ## Observe reactive elements ----------------------------------------------------------------------------------------
+  ## 230 Observe reactive elements ------------------------------------------------------------------------------------
   observe({
     data <- reactive_data()
-    ### Observe Shelves -----------------------------------------------------------------------------------------------
+
+    ### 231 Observe Shelves -------------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("shelf_", data$Book.Id[i])]], {
         data <- reactive_data()
@@ -57,23 +73,22 @@ server <- function(input, output, session) {
         output$read_ui <- render_ui_novels_read(data)
         output$did_not_finish_ui <- render_ui_did_not_finish(data)
 
-        cache <<- data
+        cache[["data"]] <<- data
       })
     })
 
-    ### Observe Novel Progress Bars -----------------------------------------------------------------------------------
+    ### 232 Observe Novel Progress Bars -------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("current_page_", data$Book.Id[i])]], {
         data <- reactive_data()
         data$Current.Page[i] <- input[[paste0("current_page_", data$Book.Id[i])]]
         reactive_data(data)
         output[[paste0("reading_progress_", data$Book.Id[i])]] <- render_progress_bar(data[i, ])
-        cache <<- data
+        cache[["data"]] <<- data
       })
     })
 
-
-    ### Observe Edit Page Count ---------------------------------------------------------------------------------------
+    ### 233 Observe Edit Page Count -----------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_numeric_dialog_", data$Book.Id[i])]], {
         showModal(modalDialog(
@@ -94,7 +109,7 @@ server <- function(input, output, session) {
       })
     })
 
-    ### Observe Edit Cover --------------------------------------------------------------------------------------------
+    ### 234 Observe Edit Cover ----------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("show_text_dialog_", data$Book.Id[i])]], {
         showModal(modalDialog(
@@ -114,29 +129,81 @@ server <- function(input, output, session) {
       })
     })
 
-    ### Observe New Page Count ----------------------------------------------------------------------------------------
+    ### 235 Observe New Page Count ------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_page_count_", data$Book.Id[i])]], {
         data <- reactive_data()
         data$Number.of.Pages[i] <- input[[paste0("page_count_", data$Book.Id[i])]]
         reactive_data(data)
-        cache <<- data
+        cache[["data"]] <<- data
         removeModal()
       })
     })
 
-    ### Observe New Cover ---------------------------------------------------------------------------------------------
+    ### 236 Observe New Cover -----------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_cover_url_", data$Book.Id[i])]], {
         data <- reactive_data()
         data$Cover_URL[i] <- input[[paste0("cover_url_", data$Book.Id[i])]]
         reactive_data(data)
-        cache <<- data
+        cache[["data"]] <<- data
         removeModal()
       })
     })
+
+    ### 237 Observe Edit Dates Read -----------------------------------------------------------------------------------
+    lapply(seq_along(data$Book.Id), function(i) {
+      observeEvent(input[[paste0("show_edit_dates_", data$Book.Id[i])]], {
+        showModal(modalDialog(
+          title = "Enter Date and Number",
+          dateInput(
+            input = paste0("date_read_", data$Book.Id[i]),
+            label = "Select a date:",
+            value = Sys.Date()
+          ),
+          numericInput(
+            input = paste0("pages_read_", data$Book.Id[i]),
+            label = "Enter a number:",
+            value = 0
+          ),
+          footer = tagList(
+            modalButton("Cancel"),
+            actionButton(
+              paste0("submit_dates_read_", data$Book.Id[i]),
+              label = "Submit"
+            )
+          )
+        ))
+      })
+    })
+
+    ### 238 Observe New Dates Read ------------------------------------------------------------------------------------
+    lapply(seq_along(data$Book.Id), function(i) {
+      observeEvent(input[[paste0("submit_dates_read_", data$Book.Id[i])]], {
+        activity <- reactive_activity()
+        data <- reactive_data()
+
+        activity <- activity %>%
+          add_row(
+            book_id = data$Book.Id[i],
+            date = input[[paste0("date_read_", data$Book.Id[i])]],
+            no_of_pages = input[[paste0("pages_read_", data$Book.Id[i])]]
+          )
+
+        output[[paste0("activity_grid_", data$Book.Id[i])]] <- render_activity_grid(data[i, ], activity)
+
+        cache[["activity"]] <<- activity
+        removeModal()
+        isolate(reactive_activity(activity))
+      })
+    })
+    ### 239 Observe Activity Update -----------------------------------------------------------------------------------
   })
 }
 
-# Run App -------------------------------------------------------------------------------------------------------------
+# 300 Run App ---------------------------------------------------------------------------------------------------------
 shinyApp(ui = ui, server = server)
+
+# 400 Grab Cache ------------------------------------------------------------------------------------------------------
+write_csv(cache[["data"]], paste0("data/output/", "cache_data.csv"))
+write_csv(cache[["activity"]], paste0("data/output/", "cache_activity.csv"))

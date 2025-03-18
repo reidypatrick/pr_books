@@ -36,6 +36,7 @@ custom_css <- "
   }
   .progress-bar-container {
     margin-top: 10px;
+    padding-left: 35px;
   }
   .progress-bar {
     background-color: #333;
@@ -45,14 +46,17 @@ custom_css <- "
   }
   .shiny-input-container {
     color: #16151c;
+    padding-left: 0px;
   }
   .shiny-input-container label {
     color: #e0e0e0;
+    text-align: left;
   }
   .shiny-numeric-input input {
     background-color: #333;
     color: #e0e0e0;
     border: 1px solid #555;
+    text-align: left;
   }
   .tabsetPanel {
     background-color: #1e1e1e;
@@ -91,23 +95,28 @@ custom_css <- "
     border-bottom-right-radius: 15px;
     border-top: 1px solid #444; /* Separator line */
   }
+  .edit-actions{
+    padding-bottom: 2px;
+  }
   .btn-primary {
     background-color: #555; /* Medium gray button */
-    border-color: #555;
+    border-color: ##1e1e1e;
     color: #ffffff; /* White text */
+    text-align: left;
   }
   .btn-primary:hover {
     background-color: #666; /* Lighter gray on hover */
-    border-color: #666;
+    border-color: ##1e1e1e;
   }
   .btn-default {
     background-color: #444; /* Dark gray button */
-    border-color: #444;
+    border-color: ##1e1e1e;
     color: #ffffff; /* White text */
+    text-align: left;
   }
   .btn-default:hover {
     background-color: #555; /* Medium gray on hover */
-    border-color: #555;
+    border-color: ##1e1e1e;
   }
   input[type='text'], 
   input[type='number'] {
@@ -115,15 +124,11 @@ custom_css <- "
     color: #ffffff; /* White text */
     border: 1px solid #555555; /* Medium gray border */
     border-radius: 5px; /* Rounded corners */
-    padding: 5px 10px; /* Padding for better appearance */
   }
   input[type='text']:focus, 
   input[type='number']:focus {
     border-color: #777777; /* Lighter gray border on focus */
     outline: none; /* Remove default outline */
-  }
-  .shiny-input-container {
-    color: #ffffff; /* White text for labels */
   }
   .dark-select .selectize-control.single .selectize-input {
     background-color: #333333; /* Dark gray background */
@@ -163,5 +168,41 @@ custom_css <- "
     background-color: #555555; /* Even lighter gray for active option */
     color: #ffffff; /* White text */
   }
+  .activity-container {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+      }
+  .y-axis-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    justify-content: space-between;
+    padding-top: 0px;  /* Align labels with cells */
+  }
+  .y-axis-label {
+    height: 15px;
+    text-align: right;
+    padding-right: 5px;
+    font-size: 12px;
+  }
+  .activity-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+  }
+  .activity-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .activity-cell {
+    width: 15px;
+    height: 15px;
+    background-color: #121212;
+    border-radius: 3px;
+  }
+  .activity-cell:hover {
+    border: 1px solid black;
 }
 "
