@@ -2,9 +2,11 @@ source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
 # 000 Load Goodreads data ---------------------------------------------------------------------------------------------
-goodreads_data <- get_goodreads_data(use_cache = FALSE)
-activity_data <- get_activity_data(use_cache = TRUE, activity_file_path = "data/output/activity_cache.csv")
+goodreads_data <- get_goodreads_data(use_cache = TRUE)
+activity_data <- get_activity_data(use_cache = TRUE)
 cache <- list()
+cache[["data"]] <- goodreads_data
+cache[["activity"]] <- activity_data
 
 
 # 100 UI --------------------------------------------------------------------------------------------------------------
@@ -30,12 +32,18 @@ server <- function(input, output, session) {
   
   ## 220 Get UI -------------------------------------------------------------------------------------------------------
   ### 221 Novel Section -----------------------------------------------------------------------------------------------
-  output$activity_grid <- render_activity_grid(temp_activity_data)
-  # ^^ temp activity grid to check ui vis ^^
   output$currently_reading_ui <- render_ui_currently_reading(goodreads_data)
   output$want_to_read_ui <- render_ui_want_to_read(goodreads_data)
   output$read_ui <- render_ui_novels_read(goodreads_data)
   output$did_not_finish_ui <- render_ui_did_not_finish(goodreads_data)
+  
+  #### 221.1 Activity Grids -------------------------------------------------------------------------------------------
+  currently_reading <- goodreads_data %>%  filter(Bookshelves == "currently-reading")
+  lapply(seq_len(nrow(currently_reading)), function(i) {
+    book <- currently_reading[i, ]
+    output[[paste0("activity_grid_", book$Book.Id)]] <- render_activity_grid(book, activity_data)
+  })
+  
 
   ### 222 Poetry Section -----------------------------------------------------------------------------------------------
   output$poetry_ui <- render_poetry_ui(goodreads_data)
@@ -52,7 +60,6 @@ server <- function(input, output, session) {
   ## 230 Observe reactive elements ------------------------------------------------------------------------------------
   observe({
     data <- reactive_data()
-    activity <- reactive_activity()
     
     ### 231 Observe Shelves -------------------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
@@ -176,17 +183,18 @@ server <- function(input, output, session) {
         activity <- reactive_activity()
         data <- reactive_data()
         
-        new_activity <- activity %>% 
+        activity <- activity %>% 
           add_row(
             book_id = data$Book.Id[i],
             date = input[[paste0("date_read_", data$Book.Id[i])]],
             no_of_pages = input[[paste0("pages_read_", data$Book.Id[i])]]
           )
         
-        output[[paste0("activity_grid_", data$Book.Id[i])]] <- render_activity_grid(data[i, ], new_activity)
+        output[[paste0("activity_grid_", data$Book.Id[i])]] <- render_activity_grid(data[i, ], activity)
         
-        cache[["activity"]] <<- new_activity
+        cache[["activity"]] <<- activity
         removeModal()
+        isolate(reactive_activity(activity))
       })
     })
     ### 239 Observe Activity Update -----------------------------------------------------------------------------------
