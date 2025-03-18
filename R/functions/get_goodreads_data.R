@@ -1,6 +1,8 @@
-get_goodreads_data <- function(use_cache = options$books_cache) {
-  if (use_cache && exists("cache")) {
-    goodreads_data <- cache
+get_goodreads_data <- function(
+    use_cache = getOption("books_cache"),
+    path = getOption("goodreads_file_path")) {
+  if (use_cache) {
+    goodreads_data <- read_csv(path)
   } else {
     read_csv(goodreads_file_path) %>%
       mutate(Current.Page = rep(0, nrow(.))) %>%
