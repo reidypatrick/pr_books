@@ -174,18 +174,23 @@ server <- function(input, output, session) {
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_dates_read_", data$Book.Id[i])]], {
         activity <- reactive_activity()
+        data <- reactive_data()
         
-        date_read <- input[[paste0("date_read_", data$Book.Id[i])]]
-        pages_read <- input[[paste0("pages_read_", data$Book.Id[i])]]
-        append(activity, c(data$Book.Id[i], date_read, pages_read))
+        new_activity <- activity %>% 
+          add_row(
+            book_id = data$Book.Id[i],
+            date = input[[paste0("date_read_", data$Book.Id[i])]],
+            no_of_pages = input[[paste0("pages_read_", data$Book.Id[i])]]
+          )
         
-        print(input)
+        output[[paste0("activity_grid_", data$Book.Id[i])]] <- render_activity_grid(data[i, ], new_activity)
+        
         cache[["activity"]] <<- new_activity
-        reactive_activity(activity)
         removeModal()
       })
     })
     ### 239 Observe Activity Update -----------------------------------------------------------------------------------
+    
   })
   
 }
