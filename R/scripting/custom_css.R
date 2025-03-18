@@ -199,7 +199,7 @@ custom_css <- "
   .activity-cell {
     width: 15px;
     height: 15px;
-    background-color: #ebedf0;
+    background-color: #121212;
     border-radius: 3px;
   }
   .activity-cell:hover {
