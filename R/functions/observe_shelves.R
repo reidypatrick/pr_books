@@ -1,5 +1,4 @@
-observe_shelves <- function(data, input, output) {
-  lapply(seq_along(data$Book.Id), function(i) {
+observe_shelves <- function(i) {
     observeEvent(input[[paste0("shelf_", data$Book.Id[i])]], {
       data <- reactive_data()
       data$Bookshelves[i] <- input[[paste0("shelf_", data$Book.Id[i])]]
@@ -12,5 +11,4 @@ observe_shelves <- function(data, input, output) {
 
       cache <<- data
     })
-  })
 }
