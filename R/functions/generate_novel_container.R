@@ -67,7 +67,7 @@ generate_novel_container <- function(book) {
         column(
           2,
           h4("Activity"),
-          div(uiOutput("activity_grid"))
+          div(uiOutput(paste0("activity_grid_", book$Book.Id)))
         )
       ),
       br(),
