@@ -7,15 +7,15 @@ library(shinyWidgets)
 library(shinyjs)
 library(readr)
 
-# Set Options ------------------------------------------------------------------
+# Set Options ---------------------------------------------------------------------------------------------------------
 options(log_verbose = TRUE)
 options(r_functions_path = "R/functions")
-options(books_cache = FALSE)
+options(books_cache = TRUE)
 
-# Source functions -------------------------------------------------------------
+# Source functions ----------------------------------------------------------------------------------------------------
 source("R/functions/source_functions.R")
 source_functions()
 
-# Set Global Variables ---------------------------------------------------------
-goodreads_file_path <- "data/output/cache2025-03-11.csv"
-activity_file_path <- "data/output/activity_data.csv"
+# Set File Paths ------------------------------------------------------------------------------------------------------
+options(goodreads_file_path = "data/output/cache_data.csv")
+options(activity_file_path = "data/output/cache_activity.csv")
