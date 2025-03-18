@@ -63,22 +63,30 @@ render_activity_grid <- function(book, activity) {
                 no_of_pages <- day_data$no_of_pages[1]
                 date <- day_data$date[1]
                 # Map no_of_pages to a color gradient
-                color <- rgb(
-                  red = 33,
-                  green = min(100 + (no_of_pages * 5), 255), # Increase green based on no_of_pages
-                  blue = 57,
-                  maxColorValue = 255,
-                  alpha = min(no_of_pages * 25, 255) # Adjust alpha based on no_of_pages
-                )
-                # Add a tooltip with the date and no_of_pages
-                div(
-                  class = "activity-cell",
-                  style = paste0("background-color: ", color, ";"),
-                  title = paste("Date:", date, "\nPages:", no_of_pages) # Tooltip content
-                )
+                if (no_of_pages != 0) {
+                  color <- rgb(
+                    red = 33,
+                    green = min(100 + (no_of_pages * 5), 255), # Increase green based on no_of_pages
+                    blue = 57,
+                    maxColorValue = 255,
+                    alpha = min(no_of_pages * 25, 255) # Adjust alpha based on no_of_pages
+                  )
+                  # Add a tooltip with the date and no_of_pages
+                  div(
+                    class = "activity-cell",
+                    style = paste0("background-color: ", color, ";"),
+                    title = paste("Date:", date, "\nPages:", no_of_pages) # Tooltip content
+                  )
+                } else {
+                  div(
+                    class = "activity-cell",
+                    style = paste0("background-color: #121212;"),
+                    title = paste("Date:", date, "\nPages:", no_of_pages) # Tooltip content
+                  )
+                }
               } else {
                 # Add an empty cell if no data exists for this day in the week
-                div(class = "activity-cell", style = "background-color: #ebedf0;")
+                div(class = "activity-cell", style = "background-color: #1e1e1e;")
               }
             }
           )
