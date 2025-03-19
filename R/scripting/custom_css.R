@@ -15,7 +15,7 @@ custom_css <- "
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
   }
   .book-cover {
-    text-align: center;
+    text-align: left;
     margin-bottom: 15px;
   }
   .book-details {
