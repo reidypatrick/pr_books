@@ -20,8 +20,14 @@ ui <- fluidPage(
     ui_poetry(),
     ui_short_fiction(),
     ui_drama(),
-    ui_non_fiction()
-  )
+    ui_non_fiction(),
+    footer = tagList(
+      actionButton(
+        paste0("save"),
+        label = "Save"
+      )
+    )
+  ),
 )
 
 # 200 Server ----------------------------------------------------------------------------------------------------------
