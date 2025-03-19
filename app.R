@@ -2,8 +2,18 @@ source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
 # 000 Load Data -------------------------------------------------------------------------------------------------------
-goodreads_data <- get_goodreads_data(use_cache = TRUE)
-activity_data <- get_activity_data(use_cache = TRUE)
+sheet_id <- drive_get("pr_books/cache")
+
+goodreads_data <- read_sheet(
+  ss = sheet_id,
+  sheet = "data"
+)
+
+activity_data <- read_sheet(
+  ss = sheet_id,
+  sheet = "activity"
+)
+
 cache <- list()
 cache[["data"]] <- goodreads_data
 cache[["activity"]] <- activity_data
@@ -80,7 +90,6 @@ server <- function(input, output, session) {
         output$did_not_finish_ui <- render_ui_did_not_finish(data)
 
         cache[["data"]] <<- data
-        saveRDS(cache, "data/output/cache.rds")
       })
     })
 
@@ -92,7 +101,6 @@ server <- function(input, output, session) {
         reactive_data(data)
         output[[paste0("reading_progress_", data$Book.Id[i])]] <- render_progress_bar(data[i, ])
         cache[["data"]] <<- data
-        saveRDS(cache, "data/output/cache.rds")
       })
     })
 
@@ -143,7 +151,6 @@ server <- function(input, output, session) {
         data <- reactive_data()
         data$Number.of.Pages[i] <- input[[paste0("page_count_", data$Book.Id[i])]]
         reactive_data(data)
-        saveRDS(cache, "data/output/cache.rds")
         cache[["data"]] <<- data
         removeModal()
       })
@@ -156,7 +163,6 @@ server <- function(input, output, session) {
         data$Cover_URL[i] <- input[[paste0("cover_url_", data$Book.Id[i])]]
         reactive_data(data)
         cache[["data"]] <<- data
-        saveRDS(cache, "data/output/cache.rds")
         removeModal()
       })
     })
@@ -203,16 +209,40 @@ server <- function(input, output, session) {
         output[[paste0("activity_grid_", data$Book.Id[i])]] <- render_activity_grid(data[i, ], activity)
 
         cache[["activity"]] <<- activity
-        saveRDS(cache, "data/output/cache.rds")
         removeModal()
         isolate(reactive_activity(activity))
       })
     })
+  ### 239 Observe Save ------------------------------------------------------------------------------------------------
+    observeEvent(input[["save"]],{
+      sheet_write(
+        cache$data,
+        ss = sheet_id,
+        sheet = "data"
+      )
+      
+      sheet_write(
+        cache$activity,
+        ss = sheet_id,
+        sheet = "activity"
+      )
+    })
   })
-  ## 240 Save on Stop -----------------------------------------------------------------------------------------------
+  
+  ## 240 Save on Stop -------------------------------------------------------------------------------------------------
   onStop(
     function() {
-      saveRDS(cache, "data/output/cache.rds")
+      sheet_write(
+        cache$data,
+        ss = sheet_id,
+        sheet = "data"
+      )
+      
+      sheet_write(
+        cache$activity,
+        ss = sheet_id,
+        sheet = "activity"
+      )
     }
   )
 }
