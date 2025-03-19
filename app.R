@@ -1,7 +1,7 @@
 source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
-# 000 Load Goodreads data ---------------------------------------------------------------------------------------------
+# 000 Load Data -------------------------------------------------------------------------------------------------------
 goodreads_data <- get_goodreads_data(use_cache = TRUE)
 activity_data <- get_activity_data(use_cache = TRUE)
 cache <- list()
@@ -74,6 +74,7 @@ server <- function(input, output, session) {
         output$did_not_finish_ui <- render_ui_did_not_finish(data)
 
         cache[["data"]] <<- data
+        saveRDS(cache, "data/output/cache.rds")
       })
     })
 
@@ -85,6 +86,7 @@ server <- function(input, output, session) {
         reactive_data(data)
         output[[paste0("reading_progress_", data$Book.Id[i])]] <- render_progress_bar(data[i, ])
         cache[["data"]] <<- data
+        saveRDS(cache, "data/output/cache.rds")
       })
     })
 
@@ -135,6 +137,7 @@ server <- function(input, output, session) {
         data <- reactive_data()
         data$Number.of.Pages[i] <- input[[paste0("page_count_", data$Book.Id[i])]]
         reactive_data(data)
+        saveRDS(cache, "data/output/cache.rds")
         cache[["data"]] <<- data
         removeModal()
       })
@@ -147,6 +150,7 @@ server <- function(input, output, session) {
         data$Cover_URL[i] <- input[[paste0("cover_url_", data$Book.Id[i])]]
         reactive_data(data)
         cache[["data"]] <<- data
+        saveRDS(cache, "data/output/cache.rds")
         removeModal()
       })
     })
@@ -193,17 +197,19 @@ server <- function(input, output, session) {
         output[[paste0("activity_grid_", data$Book.Id[i])]] <- render_activity_grid(data[i, ], activity)
 
         cache[["activity"]] <<- activity
+        saveRDS(cache, "data/output/cache.rds")
         removeModal()
         isolate(reactive_activity(activity))
       })
     })
-    ### 239 Observe Activity Update -----------------------------------------------------------------------------------
   })
+  ## 240 Save on Stop -----------------------------------------------------------------------------------------------
+  onStop(
+    function() {
+      saveRDS(cache, "data/output/cache.rds")
+    }
+  )
 }
 
 # 300 Run App ---------------------------------------------------------------------------------------------------------
 shinyApp(ui = ui, server = server)
-
-# 400 Grab Cache ------------------------------------------------------------------------------------------------------
-write_csv(cache[["data"]], paste0("data/output/", "cache_data.csv"))
-write_csv(cache[["activity"]], paste0("data/output/", "cache_activity.csv"))
