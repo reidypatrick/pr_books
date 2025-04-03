@@ -82,16 +82,16 @@ server <- function(input, output, session) {
   })
 
 
-  ### 222 Poetry Section -----------------------------------------------------------------------------------------------
+  ### 222 Poetry Section ----------------------------------------------------------------------------------------------
   output$poetry_ui <- render_poetry_ui(goodreads_data)
 
-  ### 223 Short Fiction Section ----------------------------------------------------------------------------------------
+  ### 223 Short Fiction Section ---------------------------------------------------------------------------------------
   output$short_fiction_ui <- render_short_fiction_ui(goodreads_data)
 
-  ### 224 Drama Section ------------------------------------------------------------------------------------------------
+  ### 224 Drama Section -----------------------------------------------------------------------------------------------
   output$drama_ui <- render_drama_ui(goodreads_data)
 
-  ### 225 Non-Fiction Section ------------------------------------------------------------------------------------------
+  ### 225 Non-Fiction Section -----------------------------------------------------------------------------------------
   output$non_fiction_ui <- render_non_fiction_ui(goodreads_data)
 
   ## 230 Observe reactive elements ------------------------------------------------------------------------------------
@@ -214,7 +214,7 @@ server <- function(input, output, session) {
       })
     })
 
-    ### 2308 Observe New Dates Read ------------------------------------------------------------------------------------
+    ### 2308 Observe New Dates Read -----------------------------------------------------------------------------------
     lapply(seq_along(data$Book.Id), function(i) {
       observeEvent(input[[paste0("submit_dates_read_", data$Book.Id[i])]], {
         activity <- reactive_activity()
@@ -236,7 +236,7 @@ server <- function(input, output, session) {
         isolate(reactive_activity(activity))
       })
     })
-    ### 2309 Observe Save ------------------------------------------------------------------------------------------------
+    ### 2309 Observe Save ---------------------------------------------------------------------------------------------
     observeEvent(input[["save"]], {
       sheet_write(
         cache$data,
