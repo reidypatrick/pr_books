@@ -1,0 +1,1 @@
+letterboxd_url <- "https://letterboxd.com/"
