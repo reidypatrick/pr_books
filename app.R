@@ -2,21 +2,21 @@ source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
 # 000 Load Data -------------------------------------------------------------------------------------------------------
-sheet_id <- drive_get("pr_books/cache")
-
-goodreads_data <- read_sheet(
-  ss = sheet_id,
-  sheet = "data"
-)
-
-activity_data <- read_sheet(
-  ss = sheet_id,
-  sheet = "activity"
-)
-
-cache <- list()
-cache[["data"]] <- goodreads_data
-cache[["activity"]] <- activity_data
+# sheet_id <- drive_get("pr_books/cache")
+#
+# goodreads_data <- read_sheet(
+#   ss = sheet_id,
+#   sheet = "data"
+# )
+#
+# activity_data <- read_sheet(
+#   ss = sheet_id,
+#   sheet = "activity"
+# )
+#
+# cache <- list()
+# cache[["data"]] <- goodreads_data
+# cache[["activity"]] <- activity_data
 
 
 # 100 UI --------------------------------------------------------------------------------------------------------------
@@ -35,6 +35,10 @@ ui <- fluidPage(
       actionButton(
         paste0("save"),
         label = "Save"
+      ),
+      actionButton(
+        paste0("add_book"),
+        label = "Add Book"
       )
     )
   ),
@@ -42,7 +46,24 @@ ui <- fluidPage(
 
 # 200 Server ----------------------------------------------------------------------------------------------------------
 server <- function(input, output, session) {
-  ## 210 Set reactive values ------------------------------------------------------------------------------------------
+  ## 210 Load Values ------------------------------------------------------------------------------------------
+  sheet_id <- drive_get("pr_books/cache")
+
+  goodreads_data <- read_sheet(
+    ss = sheet_id,
+    sheet = "data"
+  )
+
+  activity_data <- read_sheet(
+    ss = sheet_id,
+    sheet = "activity"
+  )
+
+  cache <- list()
+  cache[["data"]] <- goodreads_data
+  cache[["activity"]] <- activity_data
+
+  ### 210 Set Reactive Values -----------------------------------------------------------------------------------------
   reactive_data <- reactiveVal(as.data.frame(goodreads_data))
   reactive_activity <- reactiveVal(as.data.frame(activity_data))
 
@@ -98,7 +119,7 @@ server <- function(input, output, session) {
       observeEvent(input[[paste0("current_page_", data$Book.Id[i])]], {
         data <- reactive_data()
         data$Current.Page[i] <- input[[paste0("current_page_", data$Book.Id[i])]]
-        reactive_data(data)
+        isolate(reactive_data(data))
         output[[paste0("reading_progress_", data$Book.Id[i])]] <- render_progress_bar(data[i, ])
         cache[["data"]] <<- data
       })
@@ -199,12 +220,14 @@ server <- function(input, output, session) {
         activity <- reactive_activity()
         data <- reactive_data()
 
-        activity <- activity %>%
-          add_row(
-            book_id = data$Book.Id[i],
-            date = input[[paste0("date_read_", data$Book.Id[i])]],
-            no_of_pages = input[[paste0("pages_read_", data$Book.Id[i])]]
-          )
+        isolate(
+          activity <- activity %>%
+            add_row(
+              book_id = data$Book.Id[i],
+              date = input[[paste0("date_read_", data$Book.Id[i])]],
+              no_of_pages = input[[paste0("pages_read_", data$Book.Id[i])]]
+            )
+        )
 
         output[[paste0("activity_grid_", data$Book.Id[i])]] <- render_activity_grid(data[i, ], activity)
 
@@ -213,14 +236,14 @@ server <- function(input, output, session) {
         isolate(reactive_activity(activity))
       })
     })
-  ### 239 Observe Save ------------------------------------------------------------------------------------------------
-    observeEvent(input[["save"]],{
+    ### 239 Observe Save ------------------------------------------------------------------------------------------------
+    observeEvent(input[["save"]], {
       sheet_write(
         cache$data,
         ss = sheet_id,
         sheet = "data"
       )
-      
+
       sheet_write(
         cache$activity,
         ss = sheet_id,
@@ -228,7 +251,7 @@ server <- function(input, output, session) {
       )
     })
   })
-  
+
   ## 240 Save on Stop -------------------------------------------------------------------------------------------------
   onStop(
     function() {
@@ -237,7 +260,7 @@ server <- function(input, output, session) {
         ss = sheet_id,
         sheet = "data"
       )
-      
+
       sheet_write(
         cache$activity,
         ss = sheet_id,
