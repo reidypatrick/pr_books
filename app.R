@@ -2,22 +2,6 @@ source("R/scripting/config.R")
 source("R/scripting/custom_css.R")
 
 # 000 Load Data -------------------------------------------------------------------------------------------------------
-# sheet_id <- drive_get("pr_books/cache")
-#
-# goodreads_data <- read_sheet(
-#   ss = sheet_id,
-#   sheet = "data"
-# )
-#
-# activity_data <- read_sheet(
-#   ss = sheet_id,
-#   sheet = "activity"
-# )
-#
-# cache <- list()
-# cache[["data"]] <- goodreads_data
-# cache[["activity"]] <- activity_data
-
 
 # 100 UI --------------------------------------------------------------------------------------------------------------
 
@@ -236,6 +220,7 @@ server <- function(input, output, session) {
         isolate(reactive_activity(activity))
       })
     })
+
     ### 2309 Observe Save ---------------------------------------------------------------------------------------------
     observeEvent(input[["save"]], {
       sheet_write(

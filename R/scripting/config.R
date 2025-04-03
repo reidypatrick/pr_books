@@ -7,6 +7,7 @@ library(shinyWidgets)
 library(shinyjs)
 library(readr)
 library(googledrive)
+library(googlesheets4)
 
 # Set Options ---------------------------------------------------------------------------------------------------------
 options(log_verbose = TRUE)
