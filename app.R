@@ -255,49 +255,49 @@ server <- function(input, output, session) {
             style = "position: absolute; right: 20px; top: 10px;"
           )
         ),
-        #### 2310.01 Book.Id ------------------------------------------------------------------------------------------
+        #### 2310.1 Book.Id ------------------------------------------------------------------------------------------
         textInput(
           input = "Book.Id",
           label = "Book ID:",
           value = temp_book$Book.Id
         ),
-        #### 2310.02 Title --------------------------------------------------------------------------------------------
+        #### 2310.2 Title --------------------------------------------------------------------------------------------
         textInput(
           input = "Title",
           label = "Title:",
           value = temp_book$Title
         ),
-        #### 2310.03 Author -------------------------------------------------------------------------------------------
+        #### 2310.3 Author -------------------------------------------------------------------------------------------
         textInput(
           input = "Author",
           label = "Author:",
           value = temp_book$Author
         ),
-        #### 2310.04 ISBN -------------------------------------------------------------------------------------------
+        #### 2310.4 ISBN ----------------------------------------------------------------------------------------------
         textInput(
           input = "ISBN",
           label = "ISBN:",
           value = temp_book$ISBN
         ),
-        #### 2310.5 Number.of.Pages -------------------------------------------------------------------------------------------
+        #### 2310.5 Number.of.Pages -----------------------------------------------------------------------------------
         textInput(
           input = "Number.of.Pages",
           label = "Page Count:",
           value = temp_book$Number.of.Pages
         ),
-        #### 2310.6 Year.of.Publication -------------------------------------------------------------------------------------------
+        #### 2310.6 Year.of.Publication -------------------------------------------------------------------------------
         textInput(
           input = "Original.Publication.Year",
           label = "Year of Publication:",
           value = temp_book$Original.Publication.Year
         ),
-        #### 2310.7 Cover_URL -------------------------------------------------------------------------------------------
+        #### 2310.7 Cover_URL -----------------------------------------------------------------------------------------
         textInput(
           input = "Cover_URL",
           label = "Cover Path:",
           value = temp_book$Cover_URL
         ),
-        #### 2310.8 Bookshelves -------------------------------------------------------------------------------------------
+        #### 2310.8 Bookshelves ---------------------------------------------------------------------------------------
         div(
           class = "dark-select",
           selectInput(
@@ -309,7 +309,7 @@ server <- function(input, output, session) {
               "Read" = "read",
               "Did Not Finish" = "did-not-finish"
             ),
-            selected = temp_book$Bookshelves # Default shelf (if provided in the book data)
+            selected = temp_book$Bookshelves
           )
         ),
         footer = tagList(
@@ -319,7 +319,7 @@ server <- function(input, output, session) {
       ))
     })
 
-    # Observe the load data button in the first modal
+    ### 2311 Observe Button Link Data ---------------------------------------------------------------------------------
     observeEvent(input$load_data, {
       showModal(
         modalDialog(
@@ -333,6 +333,7 @@ server <- function(input, output, session) {
       )
     })
 
+    ### 2312 Observe Submit Link --------------------------------------------------------------------------------------
     observeEvent(input$submit_link, {
       # Remove the link entry modal
       removeModal()
@@ -344,18 +345,20 @@ server <- function(input, output, session) {
         # In a real app, you might use httr or similar to fetch data
         sample_data <- paste("Data from", input$data_link)
 
+        link_html <- read_html(input$data_link)
+
         # Update the reactive values with sample data
         temp_book$Book.Id <- scrape_book_id(input$data_link)
-        temp_book$Title <- scrape_title(input$data_link)
-        temp_book$Author <- scrape_author(input$data_link)
-        temp_book$ISBN <- scrape_isbn(input$data_link)
-        temp_book$No.of.Pages <- scrape_page_count(input$data_link)
-        temp_book$Original.Publication.Year <- scrape_publication_year(input$data_link)
-        temp_book$Cover_URL <- scrape_cover_url(input$data_link)
+        temp_book$Title <- scrape_title(link_html)
+        temp_book$Author <- scrape_author(link_html)
+        temp_book$ISBN <- scrape_isbn(link_html)
+        temp_book$Number.of.Pages <- scrape_page_count(link_html)
+        temp_book$Original.Publication.Year <- scrape_publication_year(link_html)
+        temp_book$Cover_URL <- scrape_cover_url(temp_book)
 
         reactive_temp_book(temp_book)
 
-        # Show the main modal again with populated data
+        #### 2312.0 Rerun Modal Dialog w/ Link Data -------------------------------------------------------------------
         showModal(modalDialog(
           title = tagList(
             "Enter Book Detials",
@@ -364,53 +367,54 @@ server <- function(input, output, session) {
               style = "position: absolute; right: 20px; top: 10px;"
             )
           ),
-          #### 2310.01 Book.Id ----------------------------------------------------------------------------------------
           textInput(
             input = "Book.Id",
             label = "Book ID:",
             value = temp_book$Book.Id
           ),
-          #### 2310.02 Title ------------------------------------------------------------------------------------------
           textInput(
             input = "Title",
             label = "Title:",
             value = temp_book$Title
           ),
-          #### 2310.03 Author -----------------------------------------------------------------------------------------
           textInput(
             input = "Author",
             label = "Author:",
             value = temp_book$Author
           ),
-          #### 2310.04 ISBN -------------------------------------------------------------------------------------------
           textInput(
             input = "ISBN",
             label = "ISBN:",
             value = temp_book$ISBN
           ),
-          #### 2310.5 Number.of.Pages ---------------------------------------------------------------------------------
           textInput(
             input = "Number.of.Pages",
             label = "Page Count:",
             value = temp_book$Number.of.Pages
           ),
-          #### 2310.6 Year.of.Publication -----------------------------------------------------------------------------
           textInput(
             input = "Original.Publication.Year",
             label = "Year of Publication:",
             value = temp_book$Original.Publication.Year
           ),
-          #### 2310.7 Cover_URL ---------------------------------------------------------------------------------------
           textInput(
             input = "Cover_URL",
             label = "Cover Path:",
             value = temp_book$Cover_URL
           ),
-          #### 2310.8 Bookshelves -------------------------------------------------------------------------------------
-          textInput(
-            input = "Bookshelves",
-            label = "Shelf:",
-            value = temp_book$Bookshelves
+          div(
+            class = "dark-select",
+            selectInput(
+              inputId = "Bookshelves",
+              label = "Shelf:",
+              choices = c(
+                "Currently Reading" = "currently-reading",
+                "Want To Read" = "to-read",
+                "Read" = "read",
+                "Did Not Finish" = "did-not-finish"
+              ),
+              selected = temp_book$Bookshelves
+            )
           ),
           footer = tagList(
             modalButton("Cancel"),
@@ -420,27 +424,39 @@ server <- function(input, output, session) {
       }
     })
 
+    ### 2313 Observe Save Added Book ----------------------------------------------------------------------------------
     observeEvent(input$save_add_book, {
       data <- reactive_data()
 
       # Update reactive values with current inputs
-      temp_book$Book.Id <- input$Book.Id
+      temp_book$Book.Id <- as.numeric(input$Book.Id)
       temp_book$Title <- input$Title
       temp_book$Author <- input$Author
       temp_book$ISBN <- input$ISBN
-      temp_book$Number.of.Pages <- input$Number.of.Pages
-      temp_book$Original.Publication.Year <- input$Original.Publication.Year
+      temp_book$Number.of.Pages <- as.numeric(input$Number.of.Pages)
+      temp_book$Original.Publication.Year <- as.numeric(input$Original.Publication.Year)
       temp_book$Cover_URL <- input$Cover_URL
       temp_book$Bookshelves <- input$Bookshelves
+      temp_book$My.Rating <- as.numeric(temp_book$My.Rating)
+      temp_book$Average.Rating <- as.numeric(temp_book$Average.Rating)
+      temp_book$Current.Page <- 0
+      temp_book$Year.Published <- temp_book$Original.Publication.Year
+      temp_book$Date.Read <- NA_Date_
+      temp_book$Date.Added <- today()
+      temp_book$Read.Count <- 0
+      temp_book$Owned.Copies <- 0
+
 
       temp_book_df <- data.frame(temp_book)
-      data <- data %>%
-        add_row(temp_book_df)
 
-      reactive_data(data)
+      isolate(
+        data <- data %>%
+          add_row(temp_book_df)
+      )
+
+      isolate(reactive_data(data))
 
 
-      print(reactive_temp_book)
 
       # Remove the modal
       removeModal()
