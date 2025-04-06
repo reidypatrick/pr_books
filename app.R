@@ -95,7 +95,7 @@ server <- function(input, output, session) {
       observeEvent(input[[paste0("shelf_", data$Book.Id[i])]], {
         data <- reactive_data()
         data$Bookshelves[i] <- input[[paste0("shelf_", data$Book.Id[i])]]
-        reactive_data(data)
+        isolate(reactive_data(data))
 
         output$currently_reading_ui <- render_ui_currently_reading(data)
         output$want_to_read_ui <- render_ui_want_to_read(data)
@@ -321,6 +321,8 @@ server <- function(input, output, session) {
 
     ### 2311 Observe Button Link Data ---------------------------------------------------------------------------------
     observeEvent(input$load_data, {
+      removeModal()
+      
       showModal(
         modalDialog(
           title = "Enter Data Link",
@@ -335,28 +337,20 @@ server <- function(input, output, session) {
 
     ### 2312 Observe Submit Link --------------------------------------------------------------------------------------
     observeEvent(input$submit_link, {
-      # Remove the link entry modal
       removeModal()
 
-      # Here you would typically fetch data from the link
-      # For this example, we'll just use some sample data
       if (nzchar(input$data_link)) {
-        # Simulate loading data from a link
-        # In a real app, you might use httr or similar to fetch data
-        sample_data <- paste("Data from", input$data_link)
-
         link_html <- read_html(input$data_link)
 
-        # Update the reactive values with sample data
         temp_book$Book.Id <- scrape_book_id(input$data_link)
         temp_book$Title <- scrape_title(link_html)
         temp_book$Author <- scrape_author(link_html)
         temp_book$ISBN <- scrape_isbn(link_html)
         temp_book$Number.of.Pages <- scrape_page_count(link_html)
         temp_book$Original.Publication.Year <- scrape_publication_year(link_html)
-        temp_book$Cover_URL <- scrape_cover_url(temp_book)
+        temp_book$Cover_URL <- scrape_cover_url(link_html)
 
-        reactive_temp_book(temp_book)
+        isolate(reactive_temp_book(temp_book))
 
         #### 2312.0 Rerun Modal Dialog w/ Link Data -------------------------------------------------------------------
         showModal(modalDialog(
@@ -427,27 +421,33 @@ server <- function(input, output, session) {
     ### 2313 Observe Save Added Book ----------------------------------------------------------------------------------
     observeEvent(input$save_add_book, {
       data <- reactive_data()
+      temp_book <- reactive_temp_book()
 
       # Update reactive values with current inputs
-      temp_book$Book.Id <- as.numeric(input$Book.Id)
-      temp_book$Title <- input$Title
-      temp_book$Author <- input$Author
-      temp_book$ISBN <- input$ISBN
-      temp_book$Number.of.Pages <- as.numeric(input$Number.of.Pages)
-      temp_book$Original.Publication.Year <- as.numeric(input$Original.Publication.Year)
-      temp_book$Cover_URL <- input$Cover_URL
-      temp_book$Bookshelves <- input$Bookshelves
-      temp_book$My.Rating <- as.numeric(temp_book$My.Rating)
-      temp_book$Average.Rating <- as.numeric(temp_book$Average.Rating)
-      temp_book$Current.Page <- 0
-      temp_book$Year.Published <- temp_book$Original.Publication.Year
-      temp_book$Date.Read <- NA_Date_
-      temp_book$Date.Added <- today()
-      temp_book$Read.Count <- 0
-      temp_book$Owned.Copies <- 0
+      isolate(temp_book$Book.Id <- as.numeric(input$Book.Id))
+      isolate(temp_book$Title <- input$Title)
+      isolate(temp_book$Author <- input$Author)
+      isolate(temp_book$ISBN <- input$ISBN)
+      isolate(temp_book$Number.of.Pages <- as.numeric(input$Number.of.Pages))
+      isolate(temp_book$Original.Publication.Year <- as.numeric(input$Original.Publication.Year))
+      isolate(temp_book$Cover_URL <- input$Cover_URL)
+      isolate(temp_book$Bookshelves <- input$Bookshelves)
+      isolate(temp_book$My.Rating <- as.numeric(temp_book$My.Rating))
+      isolate(temp_book$Average.Rating <- as.numeric(temp_book$Average.Rating))
+      isolate(temp_book$Current.Page <- 0)
+      isolate(temp_book$Year.Published <- temp_book$Original.Publication.Year)
+      isolate(temp_book$Date.Read <- NA_Date_)
+      isolate(temp_book$Date.Added <- today())
+      isolate(temp_book$Read.Count <- 0)
+      isolate(temp_book$Owned.Copies <- 0)
 
-
-      temp_book_df <- data.frame(temp_book)
+      isolate(temp_book_df <- data.frame(temp_book))
+      
+      temp_book <- list()
+      
+      for (i in seq_len(ncol(goodreads_data))) {
+        temp_book[[paste0(colnames(goodreads_data)[i])]] <- ""
+      }
 
       isolate(
         data <- data %>%
@@ -455,10 +455,8 @@ server <- function(input, output, session) {
       )
 
       isolate(reactive_data(data))
+      cache[["data"]] <<- data
 
-
-
-      # Remove the modal
       removeModal()
     })
   })
@@ -477,6 +475,7 @@ server <- function(input, output, session) {
         ss = sheet_id,
         sheet = "activity"
       )
+      cache <<- cache
     }
   )
 }

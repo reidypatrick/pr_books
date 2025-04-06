@@ -1,3 +1,3 @@
-scrape_isbn <- function(url) {
-  "Enter ISBN"
+scrape_isbn <- function(html) {
+  "000"
 }
